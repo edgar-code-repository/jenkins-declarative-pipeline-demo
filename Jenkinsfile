@@ -1,22 +1,34 @@
 pipeline {
     agent any
 
-    stages{
-        stage('Cloning Java App from Github') {
+    stages {
+        stage ('Printing environment variables') {
+            steps {
+                echo "Printing environment variables"
+                sh '''
+                    echo "PATH = ${PATH}"
+                    java -version
+                    mvn -version
+                    git --version
+                    docker --version
+                ''' 
+            }
+            
+        }
+
+        stage("Cloning Java App from Github") {
             steps {
                 echo "Cloning Java App from Github..."
-            }
-        }
-    
-        stage('Building Java App with Maven') {
-            steps {
-                echo "Building Java App with Maven..."
+                git 'https://github.com/edgar-code-repository/running-rest-demo-with-docker'
             }
         }
 
-        stage('Sonar Quality Check') {
+        stage("Building Java App with Maven") {
             steps {
-                echo "Sonar Quality Check..."
+                echo "Building Java App with Maven..."
+                sh '''
+                    mvn clean package -DskipTests
+                 '''
             }
         }
 
