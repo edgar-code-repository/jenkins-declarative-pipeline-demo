@@ -43,6 +43,24 @@ pipeline {
                  '''
             }
         }
+        
+        stage("Sonar Quality Check") {
+	    steps {
+                echo "Sonar Quality Check..."
+		script {
+    	            withSonarQubeEnv(installationName: 'Sonarqube_9.6.1', credentialsId: 'Token_For_Jenkins') {
+    	                sh 'mvn sonar:sonar'
+                    }
+                    timeout(time: 5, unit: 'MINUTES') {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+    	    	    }
+		}
+                
+	    }
+        }         
 
     }
 
